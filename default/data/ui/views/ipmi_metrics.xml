@@ -35,10 +35,11 @@
   </row>
   <row>
     <panel>
-      <title>Voltages (mstats)</title>
+      <title>Voltages (mstats — 12V/3.3V/Vcore/BAT…)</title>
       <chart>
         <search>
-          <query>| mstats avg("ipmi.*volt*") as "v**" where index=metrics by metric_name span=5m
+          <query>| mstats avg("ipmi.*") as "v*" where index=metrics by metric_name span=5m
+| search metric_name IN ("ipmi.*volt*","ipmi.*vcore*","ipmi.*vdd*","ipmi.*12v*","ipmi.*3v*","ipmi.*48v*","ipmi.*5v*","ipmi.*bat*","ipmi.*p1_p*")
 | foreach v* [eval Value=coalesce(Value,&lt;&lt;FIELD&gt;&gt;)]
 | fields - v*
 | xyseries _time metric_name Value</query>
@@ -50,10 +51,11 @@
       </chart>
     </panel>
     <panel>
-      <title>Power (mstats)</title>
+      <title>Power Draw (mstats — watts/PSU/Input…)</title>
       <chart>
         <search>
-          <query>| mstats avg("ipmi.*watt*") as "v**" where index=metrics by metric_name span=5m
+          <query>| mstats avg("ipmi.*") as "v*" where index=metrics by metric_name span=5m
+| search metric_name IN ("ipmi.*watt*","ipmi.*power*","ipmi.*psu*","ipmi.*input*","ipmi.*output*")
 | foreach v* [eval Value=coalesce(Value,&lt;&lt;FIELD&gt;&gt;)]
 | fields - v*
 | xyseries _time metric_name Value</query>
