@@ -1,0 +1,49 @@
+<dashboard version="1.1" theme="light">
+  <label>IPMI Overview</label>
+  <description>Live BMC health from ipmitool: sensor readings, chassis/BMC status, and the System Event Log (SEL)</description>
+  <row>
+    <panel>
+      <title>Chassis and BMC Status (latest)</title>
+      <table>
+        <search>
+          <query>index=main sourcetype="ipmi:status"
+| stats latest(_time) as "Last seen" latest(chassis_system_power_state) as "System Power" latest(chassis_last_power_event) as "Last Power Event" latest(chassis_power_restore_policy) as "Restore Policy" latest(bmc_firmware) as "BMC Firmware" by host</query>
+          <done/>
+        </search>
+        <option name="drilldown">none</option>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Current Sensor Readings (metrics)</title>
+      <table>
+        <search>
+          <query>| mstats avg("ipmi.*") as "r*" where index=metrics by metric_name span=1h
+| foreach r* [eval Reading=coalesce(Reading,&lt;&lt;FIELD&gt;&gt;)]
+| fields - r*
+| table _time metric_name Reading
+| rename metric_name as Metric
+| sort Metric</query>
+          <done/>
+        </search>
+        <option name="drilldown">none</option>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>System Event Log (newest first)</title>
+      <table>
+        <search>
+          <query>index=main sourcetype="ipmi:sel"
+| sort - _time
+| table _time host sel_record_id sel_sensor sel_type sel_assertion sel_data
+| head 200</query>
+          <done/>
+        </search>
+        <option name="drilldown">none</option>
+      </table>
+    </panel>
+  </row>
+</dashboard>

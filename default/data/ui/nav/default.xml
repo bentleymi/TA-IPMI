@@ -1,0 +1,7 @@
+<application>
+  <nav>
+    <view name="ipmi_overview" />
+    <view name="ipmi_metrics" />
+    <search label="IPMI Events" search="search index=main (sourcetype=ipmi:status OR sourcetype=ipmi:sel)" />
+  </nav>
+</application>

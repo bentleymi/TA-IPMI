@@ -1,0 +1,65 @@
+SOURCE-AVAILABLE LICENSE - FREE PERSONAL USE / PAID COMMERCIAL USE
+
+Copyright (c) 2025-2026 BentleyPC LLC. All Rights Reserved.
+
+TA-Nvidia is source-available software owned by BentleyPC LLC. It is NOT
+distributed under any open source license (including but not limited to
+Apache License, MIT License, GPL, LGPL, BSD).
+
+FREE USE (PERSONAL / INTERNAL EVALUATION)
+-----------------------------------------
+You may use, copy, and display this software free of charge for:
+
+1. Personal, non-commercial use;
+2. Evaluation on your own Splunk instance(s);
+3. Internal training and demonstrations.
+
+You may inspect and study the source code freely.
+
+COMMERCIAL USE REQUIRES A PAID LICENSE
+--------------------------------------
+Any commercial or production use of this software - including use at, for,
+or in connection with any business, enterprise, or organization that derives
+commercial benefit from it - requires a separate paid commercial license
+agreement with BentleyPC LLC. To obtain a commercial license, contact:
+michael@bentleypc.com
+
+RESTRICTIONS
+------------
+1. NO REDISTRIBUTION: You may not copy, distribute, sublicense, sell,
+   lease, rent, or transfer this software or any portion thereof to any
+   third party without explicit written permission from BentleyPC LLC.
+
+2. NO REMOVAL OF NOTICES: You may not remove or alter any copyright,
+   trademark, or license notices.
+
+3. NO COMMERCIAL RESELLING OR HOSTING: You may not offer this software or
+   derivative services based on it as a commercial product or hosted
+   service without a commercial license.
+
+OWNERSHIP
+---------
+This software is licensed, not sold. BentleyPC LLC retains all right,
+title, and interest in and to the software, including all intellectual
+property rights.
+
+TERMINATION
+-----------
+This license is effective until terminated. It terminates automatically
+without notice from BentleyPC LLC if you fail to comply with any term of
+this agreement. Upon termination, you must cease all use and destroy all
+copies of the software.
+
+DISCLAIMER
+----------
+THIS SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+BENTLEYPC LLC BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+GOVERNING LAW
+-------------
+This license shall be governed by and construed in accordance with the laws
+of the State of Georgia, without regard to its conflict of law provisions.

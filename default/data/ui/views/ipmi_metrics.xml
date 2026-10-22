@@ -1,0 +1,81 @@
+<dashboard version="1.1" theme="light">
+  <label>IPMI Metrics</label>
+  <description>Index-time metrics over index=metrics (sourcetype=ipmi:metrics)</description>
+  <row>
+    <panel>
+      <title>Temperatures (mstats)</title>
+      <chart>
+        <search>
+          <query>| mstats avg("ipmi.*temp*") as "v**" where index=metrics by metric_name span=5m
+| foreach v* [eval Value=coalesce(Value,&lt;&lt;FIELD&gt;&gt;)]
+| fields - v*
+| xyseries _time metric_name Value</query>
+          <done/>
+        </search>
+        <option name="charting.chart">line</option>
+        <option name="charting.chart.showDataLabels">none</option>
+        <option name="charting.drilldown">none</option>
+      </chart>
+    </panel>
+    <panel>
+      <title>Fans (mstats)</title>
+      <chart>
+        <search>
+          <query>| mstats avg("ipmi.*fan*") as "v**" where index=metrics by metric_name span=5m
+| foreach v* [eval Value=coalesce(Value,&lt;&lt;FIELD&gt;&gt;)]
+| fields - v*
+| xyseries _time metric_name Value</query>
+          <done/>
+        </search>
+        <option name="charting.chart">line</option>
+        <option name="charting.chart.showDataLabels">none</option>
+        <option name="charting.drilldown">none</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Voltages (mstats)</title>
+      <chart>
+        <search>
+          <query>| mstats avg("ipmi.*volt*") as "v**" where index=metrics by metric_name span=5m
+| foreach v* [eval Value=coalesce(Value,&lt;&lt;FIELD&gt;&gt;)]
+| fields - v*
+| xyseries _time metric_name Value</query>
+          <done/>
+        </search>
+        <option name="charting.chart">line</option>
+        <option name="charting.chart.showDataLabels">none</option>
+        <option name="charting.drilldown">none</option>
+      </chart>
+    </panel>
+    <panel>
+      <title>Power (mstats)</title>
+      <chart>
+        <search>
+          <query>| mstats avg("ipmi.*watt*") as "v**" where index=metrics by metric_name span=5m
+| foreach v* [eval Value=coalesce(Value,&lt;&lt;FIELD&gt;&gt;)]
+| fields - v*
+| xyseries _time metric_name Value</query>
+          <done/>
+        </search>
+        <option name="charting.chart">column</option>
+        <option name="charting.chart.showDataLabels">none</option>
+        <option name="charting.drilldown">none</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Distinct ipmi.* Metrics (last hour)</title>
+      <single>
+        <search>
+          <query>| mcatalog values(metric_name) as m where index=metrics metric_name="ipmi.*"
+| eval count=mvcount(m)</query>
+          <done/>
+        </search>
+        <option name="underLabel">ipmi.* metrics streaming</option>
+      </single>
+    </panel>
+  </row>
+</dashboard>

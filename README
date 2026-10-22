@@ -1,0 +1,51 @@
+# TA-IPMI — IPMI BMC Telemetry Add-on
+
+Collects server BMC health via `ipmitool` (local open interface) on the Splunk host:
+- Sensor readings (temperature, fan RPM, voltage, watts) + chassis/BMC status as JSON events to `index=main`, sourcetype `ipmi:status`
+- Numeric sensors as time-series metrics to `index=metrics`, sourcetype `ipmi:metrics` (metric names `ipmi.*`)
+- New System Event Log (SEL) records as events to `index=main`, sourcetype `ipmi:sel` (each record indexed exactly once)
+
+Dashboards: **IPMI Overview** (chassis/BMC status, current sensor table, SEL log) and **IPMI Metrics** (trended temp/fan/voltage/power via mstats).
+
+## Prerequisites
+
+On every host where the inputs run:
+
+1. **ipmitool must be installed** — this is the only external dependency:
+   - Debian/Ubuntu: `apt-get install -y ipmitool`
+   - RHEL/CentOS/Rocky/Alma: `yum install -y ipmitool` (or `dnf install -y ipmitool`)
+   - SLES: `zypper install ipmitool`
+2. **A server-class BMC the OS can reach via the system interface.** Kernel drivers loaded (typical on bare-metal servers):
+   `modprobe ipmi_si ipmi_devintf` — this creates `/dev/ipmi0`.
+   Check with: `ipmitool -I open mc info`
+   On hosts without a local BMC (workstations, VMs, cloud), the inputs detect the missing
+   `/dev/ipmi0`, log a short notice to `splunkd.log`, and exit cleanly; disable them there
+   with an `local/inputs.conf` override (`disabled = 1`).
+3. Splunk Enterprise 9.x (uses the built-in Python 3; inputs set `python.version = python3`).
+4. An index named `metrics` with `datatype=metric` accessible for the metric stream
+   (the app intentionally does **not** ship indexes.conf; it reuses your metrics index).
+5. The splunk user must be able to execute `ipmitool -I open ...` (on some distros this needs
+   the user in group `ipmi` or access to `/dev/ipmi0`).
+
+## Install
+
+Apps > Install app from file with `TA-IPMI.tar.gz`, or extract into `$SPLUNK_HOME/etc/apps/`.
+Restart (or wait for auto-reload) and collection starts every 60s (SEL every 120s).
+
+## Verify
+
+    index=main sourcetype="ipmi:status" | head
+    index=main sourcetype="ipmi:sel" | head
+    index=metrics | mstats avg("ipmi.cpu_temp") span=1m
+
+## Troubleshooting
+
+- "Command `sdr list full` unsupported, trying plain" lines are normal (driver-dependent).
+- No data: run `ipmitool -I open sdr list` as the splunk user. If that fails, the app will too.
+- `Could not open device at /dev/ipmi0`: load `ipmi_si`/`ipmi_devintf` kernel modules or disable on BMC-less hosts.
+- BAD_METRIC_EVENT: ensure props.conf `[ipmi:metrics]` TRANSFORMS/METRIC-SCHEMA and transforms.conf stanzas were not overridden in `local/`, and `index=metrics` is a metric index.
+- SEL duplicates only appear if `$SPLUNK_HOME/var/lib/splunk/TA-IPMI/sel_last_id` is deleted (it is a high-water mark store).
+
+## License
+
+Source-available. Free for personal/evaluation/non-commercial use; commercial use requires a paid license: michael@bentleypc.com — BentleyPC LLC. See LICENSE. Source: https://github.com/bentleymi/TA-IPMI
