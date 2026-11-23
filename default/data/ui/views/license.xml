@@ -7,7 +7,7 @@
       <table>
         <search>
           <query>| makeresults | eval host="OPEN LICENSE SETUP PAGE", status="Paste your BP- key from bentleypc.com/TA-IPMI", last_reported="hourly beacon sends only: key, hostname, app, version", note="Buy or trial a license at bentleypc.com/TA-IPMI" | fields host status last_reported note
-| append [ search index=main sourcetype="ta_license:status" source="ta_license:TA-IPMI" earliest=-48h | stats latest(_time) as seen, latest(status) as status, latest(message) as note by host | eval last_reported=strftime(seen,"%F %H:%M") | fields host status last_reported note ]
+| append [ search index=main sourcetype="ta_license:status" app="TA-IPMI" earliest=-48h | stats latest(_time) as seen, latest(status) as status, latest(message) as note by host | eval last_reported=strftime(seen,"%F %H:%M") | fields host status last_reported note ]
 | sort host</query>
         </search>
         <option name="drilldown">cell</option>

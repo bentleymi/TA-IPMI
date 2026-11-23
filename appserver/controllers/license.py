@@ -1,3 +1,4 @@
+import glob
 import json
 import os
 import time
@@ -11,6 +12,7 @@ import cherrypy
 import splunk.appserver.mrsparkle.controllers as _ctl
 
 APP = "TA-IPMI"
+SOURCE = "ta_license:TA-IPMI"
 LICENSE_APP = "ta-ipmi"
 
 
@@ -90,16 +92,21 @@ def _json(body):
 
 def _index_event(payload):
     try:
+        for old in glob.glob("/tmp/ta_license_*_[0-9]*.json"):
+            if time.time() - os.path.getmtime(old) > 86400:
+                os.unlink(old)
+    except Exception:
+        pass
+    try:
         path = "/tmp/ta_license_%s_%d.json" % (APP.replace("-", "_"), int(time.time()))
         fd = os.open(path, os.O_WRONLY | os.O_CREAT | os.O_TRUNC, 0o644)
         with os.fdopen(fd, "w") as fh:
             fh.write(json.dumps(payload) + "\n")
         import splunk.rest as rest
-        session = cherrypy.session.get("sessionKey", "")
-        rest.simpleRequest(
-            "/data/inputs/oneshot?name=%s&index=main&sourcetype=ta_license:status&source=ta_license%3ATA-IPMI&host=%s"
-            % (urllib.parse.quote(path), urllib.parse.quote(socket.gethostname())),
-            sessionKey=session, method="POST")
+        session = cherrypy.session.get("sessionKey") or cherrypy.request.params.get("sessionKey", "")
+        args = {"name": path, "index": "main", "sourcetype": "ta_license:status"}
+        rest.simpleRequest("/data/inputs/oneshot", sessionKey=session, method="POST",
+                           getargs=args, postargs=args, raiseAllErrors=True)
     except Exception:
         pass  # status visibility is best-effort, never fail the save
 
