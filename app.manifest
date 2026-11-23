@@ -5,7 +5,7 @@
     "id": {
       "group": null,
       "name": "TA-IPMI",
-      "version": "1.0.0"
+      "version": "1.0.5"
     },
     "author": [
       {
@@ -52,6 +52,5 @@
   "targetWorkloads": [
     "_search_heads",
     "_indexers"
-  ],
-  "version": "1.0.5"
+  ]
 }
