@@ -7,12 +7,20 @@
       "name": "TA-IPMI",
       "version": "1.0.0"
     },
-    "author": [{"name":"Michael \"JKat54\" Bentley","email":"michael@bentleypc.com","company":"BentleyPC LLC"}],
+    "author": [
+      {
+        "name": "Michael \"JKat54\" Bentley",
+        "email": "michael@bentleypc.com",
+        "company": "BentleyPC LLC"
+      }
+    ],
     "releaseDate": "10/21/2026",
     "description": "Collects IPMI BMC health data via ipmitool (local open interface). Emits sensor readings and chassis/BMC status as JSON events to index=main (sourcetype ipmi:status), numeric sensor metrics to index=metrics (sourcetype ipmi:metrics, ipmi.* metrics), and new System Event Log records as events (sourcetype ipmi:sel), with IPMI overview and metrics dashboards.",
     "classification": {
       "intendedAudience": "IT",
-      "categories": ["IT Operations"],
+      "categories": [
+        "IT Operations"
+      ],
       "developmentStatus": "Production/Latest"
     },
     "commonInformationModels": null,
@@ -41,5 +49,9 @@
     "_standalone",
     "_distributed"
   ],
-  "targetWorkloads": ["_search_heads", "_indexers"]
+  "targetWorkloads": [
+    "_search_heads",
+    "_indexers"
+  ],
+  "version": "1.0.5"
 }
