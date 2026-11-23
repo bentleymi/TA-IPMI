@@ -20,7 +20,7 @@
           </done>
         </search>
         <option name="mapping">[{"color":"#2e7d32","value":"Licensed"},{"color":"#c62828","value":"Unlicensed"}]</option>
-        <option name="underLabel">key beacon within 24h &lt;a href="/app/TA-IPMI/license"&gt;enter key&lt;/a&gt;</option>
+        <option name="underLabel">key beacon within 3h - enter a key on the License page</option>
       </single>
     </panel>
     <panel depends="$IPMI_lic_ok$">
