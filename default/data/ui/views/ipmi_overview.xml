@@ -18,16 +18,16 @@
   </row>
   <row>
     <panel>
-      <title>License status (click a row to configure the key)</title>
+      <title>License status (click "Open License Setup page" to paste your key)</title>
       <table>
         <search>
-          <query>index=main sourcetype="ta_license:status" latest=now earliest=-48h | stats latest(_time) as seen, latest(status) as status, latest(message) as note by host | eval last_reported=strftime(seen,"%F %H:%M") | table host status last_reported note</query>
+          <query>index=main sourcetype="ta_license:status" latest=now earliest=-48h | stats latest(_time) as seen, latest(status) as status, latest(message) as note by host | eval last_reported=strftime(seen,"%F %H:%M"), setup="Open License Setup page - paste your key" | append [ | makeresults | eval host="this deployment", status="no data yet", note="beacon reports hourly once a key is set", last_reported="n/a", setup="Open License Setup page - paste your key" ] | table host status last_reported note setup | sort host</query>
         </search>
         <option name="drilldown">cell</option>
         <option name="rowNumbers">false</option>
         <option name="count">0</option>
         <drilldown>
-          <condition field="host"><link target="_blank">/static/app/TA-IPMI/license.html</link></condition>
+          <condition field="setup"><link target="_blank">/static/app/TA-IPMI/license.html</link></condition>
         </drilldown>
       </table>
     </panel>
