@@ -49,3 +49,29 @@ Restart (or wait for auto-reload) and collection starts every 60s (SEL every 120
 ## License
 
 Source-available. Free for personal/evaluation/non-commercial use; commercial use requires a paid license: michael@bentleypc.com — BentleyPC LLC. See LICENSE. Source: https://github.com/bentleymi/TA-IPMI
+
+License
+-------
+SOURCE-AVAILABLE (see LICENSE) - free personal, educational and evaluation
+use; commercial or production use requires a paid license from BentleyPC
+LLC (https://www.bentleypc.com/TA-IPMI).
+
+Enter your key (format BP-...) after purchase using EITHER method:
+
+  1. Splunk Web: open the app, click "License" in the nav, click a row to
+     open the key entry page, paste the key and Save.
+
+  2. File (headless / forwarder friendly): create the file
+     $SPLUNK_HOME/etc/apps/TA-IPMI/local/license.conf with:
+
+         [settings]
+         telemetry_enabled = 1
+         key = BP-xxxxxxxxxxxx
+
+     No restart required - the hourly beacon reads this file on every run.
+
+Set telemetry_enabled = 0 to keep the key for validation but pause all
+outbound beacons. The beacon sends only: license key, hostname, app name
+and app version to the BentleyPC license API (see api_base in
+default/license.conf). It is telemetry only - never a license check that
+blocks functionality.

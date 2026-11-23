@@ -1,0 +1,25 @@
+<dashboard version="1.1" theme="light">
+  <label>License</label>
+  <description>Enter the BentleyPC license key for TA-IPMI and review hourly usage beacon status. Evaluation, personal and lab use is free; commercial use requires a license. Alternatively write the key directly to local/license.conf inside the app directory (no restart needed).</description>
+  <row>
+    <panel>
+      <title>License setup and status — click any row to open the key entry page</title>
+      <table>
+        <search>
+          <query>| makeresults | eval host="OPEN LICENSE SETUP PAGE", status="Paste your BP- key from bentleypc.com/TA-IPMI", last_reported="hourly beacon sends only: key, hostname, app, version", note="Buy or trial a license at bentleypc.com/TA-IPMI" | fields host status last_reported note
+| append [ search index=main sourcetype="ta_license:status" source="ta_license:TA-IPMI" earliest=-48h | stats latest(_time) as seen, latest(status) as status, latest(message) as note by host | eval last_reported=strftime(seen,"%F %H:%M") | fields host status last_reported note ]
+| sort host</query>
+        </search>
+        <option name="drilldown">cell</option>
+        <option name="rowNumbers">false</option>
+        <option name="count">0</option>
+        <drilldown>
+          <condition field="host"><link target="_blank">/static/app/TA-IPMI/license.html</link></condition>
+          <condition field="status"><link target="_blank">/static/app/TA-IPMI/license.html</link></condition>
+          <condition field="last_reported"><link target="_blank">/static/app/TA-IPMI/license.html</link></condition>
+          <condition field="note"><link target="_blank">/static/app/TA-IPMI/license.html</link></condition>
+        </drilldown>
+      </table>
+    </panel>
+  </row>
+</dashboard>

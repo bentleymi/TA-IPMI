@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Hourly license beacon for TA-disk (Phase B).
+"""Hourly license beacon for TA-IPMI (Phase B).
 
 Reads key/telemetry config from local/license.conf (falling back to
 default/license.conf), POSTs telemetry to the BentleyPC license API and

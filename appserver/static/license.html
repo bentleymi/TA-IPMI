@@ -39,6 +39,7 @@ a{color:#1d4ed8}
     <button id="clear" class="secondary">Remove key</button>
   </div>
   <div id="msg"></div>
+  <div class="muted" style="margin-top:16px;font-size:.85rem">No UI? Edit the file directly: <code>$SPLUNK_HOME/etc/apps/TA-IPMI/local/license.conf</code> with <code>[settings]</code> / <code>key = BP-...</code> / <code>telemetry_enabled = 1</code> - no restart needed.</div>
 </div>
 <script>
 const API = '/custom/TA-IPMI/license/';
@@ -47,6 +48,8 @@ function show(st){
   const c=document.getElementById('chip'), s=document.getElementById('seats');
   if(!st.configured){c.textContent='No key set (free evaluation mode)';c.className='chip';}
   else if(st.verify && st.verify.ok){c.textContent='Active — '+(st.verify.seats||'?')+' seat'+((st.verify.seats||1)>1?'s':'');c.className='chip active';}
+  else if(st.verify && st.verify.reason==='app_not_licensed' && st.verify.apps){c.textContent='Key valid, does not cover this app';c.className='chip bad';
+    document.getElementById('seats').textContent='This key covers: '+(st.verify.apps.map(a=>a.startsWith('TA-')?a.slice(3):a).join(', '));}
   else {c.textContent='Key rejected ('+(st.verify&&st.verify.reason||'?')+')';c.className='chip bad';}
   s.textContent = st.configured ? (st.telemetry_enabled==='1'?'beacon on':'beacon off') : '';
   if(st.configured) document.getElementById('tel').checked = st.telemetry_enabled==='1';

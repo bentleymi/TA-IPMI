@@ -1,8 +1,10 @@
 import json
 import os
+import time
 import re
 import urllib.parse
 import urllib.request
+import socket
 
 import cherrypy
 
@@ -86,6 +88,38 @@ def _json(body):
     return json.dumps(body).encode()
 
 
+def _index_event(payload):
+    try:
+        path = "/tmp/ta_license_%s_%d.json" % (APP.replace("-", "_"), int(time.time()))
+        fd = os.open(path, os.O_WRONLY | os.O_CREAT | os.O_TRUNC, 0o644)
+        with os.fdopen(fd, "w") as fh:
+            fh.write(json.dumps(payload) + "\n")
+        import splunk.rest as rest
+        session = cherrypy.session.get("sessionKey", "")
+        rest.simpleRequest(
+            "/data/inputs/oneshot?name=%s&index=main&sourcetype=ta_license:status&source=ta_license%3ATA-IPMI&host=%s"
+            % (urllib.parse.quote(path), urllib.parse.quote(socket.gethostname())),
+            sessionKey=session, method="POST")
+    except Exception:
+        pass  # status visibility is best-effort, never fail the save
+
+
+def _immediate_status(conf):
+    if not conf["key"]:
+        return {"time": int(time.time()), "status": "unconfigured", "app": APP,
+                "message": "no license key set - add one on the License page"}
+    if conf["telemetry_enabled"].strip() not in ("1", "true", "yes"):
+        return {"time": int(time.time()), "status": "disabled", "app": APP,
+                "message": "license key set, telemetry off"}
+    v = _verify(conf["key"], conf["api_base"])
+    if v.get("ok"):
+        return {"time": int(time.time()), "status": "active", "app": APP,
+                "host": socket.gethostname(), "message": "key saved and verified"}
+    return {"time": int(time.time()), "status": "invalid", "app": APP,
+            "host": socket.gethostname(), "reason": str(v.get("reason", "unknown")),
+            "message": "key saved but rejected: %s" % v.get("reason")}
+
+
 class LicenseEndpoint(_ctl.BaseController):
 
     @cherrypy.expose
@@ -98,6 +132,7 @@ class LicenseEndpoint(_ctl.BaseController):
             _write_settings(key=kwargs.get("key"), telemetry=kwargs.get("telemetry"))
         except ValueError as exc:
             return _json({"ok": False, "reason": str(exc)})
+        _index_event(_immediate_status(_read_settings()))
         return _json(_status_body())
 
 
