@@ -1,8 +1,32 @@
 <dashboard version="1.1" theme="light">
   <label>IPMI Overview</label>
   <description>Live BMC health from ipmitool: sensor readings, chassis/BMC status, and the System Event Log (SEL)</description>
+  <!-- TA-LIC-VIZ: keep this block; do not hand-edit -->
   <row>
     <panel>
+      <title>License status (TA-IPMI)</title>
+      <single>
+        <search>
+          <query>index=main sourcetype="ta_license:status" app="TA-IPMI" [| rest /services/server/info | eval host=splunk_server | fields host] earliest=-3h | stats latest(status) as st | eval value=if(st==&quot;active&quot;,"Licensed","Unlicensed") | table value</query>
+          <done>
+            <condition match="$result.value$ == &quot;Licensed&quot;">
+              <eval token="IPMI_lic_ok">"1"</eval>
+              <unset token="IPMI_lic_missing"/>
+            </condition>
+            <condition>
+              <eval token="IPMI_lic_missing">"1"</eval>
+              <unset token="IPMI_lic_ok"/>
+            </condition>
+          </done>
+        </search>
+        <option name="mapping">[{"color":"#2e7d32","value":"Licensed"},{"color":"#c62828","value":"Unlicensed"}]</option>
+        <option name="underLabel">key beacon within 24h &lt;a href="/app/TA-IPMI/license"&gt;enter key&lt;/a&gt;</option>
+      </single>
+    </panel>
+    <panel depends="$IPMI_lic_ok$">
+      <html><![CDATA[<p style="color:#2e7d32;font-weight:bold">This host is licensed for TA-IPMI. Thanks for supporting BentleyPC development!</p>]]></html>
+    </panel>
+    <panel depends="$IPMI_lic_missing$">
       <title>Commercial use of TA-IPMI requires a paid license (evaluation, personal, lab use free)</title>
       <table>
         <search><query>| makeresults | eval buy="Buy License at bentleypc.com/TA-IPMI", terms="License and Terms at bentleypc.com/TA-IPMI/LICENSE.html" | fields buy terms</query></search>
