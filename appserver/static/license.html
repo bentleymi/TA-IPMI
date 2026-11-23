@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="referrer" content="same-origin">
+<title>TA-IPMI License Setup</title>
+<style>
+body{font-family:Arial,sans-serif;background:#f4f5f7;margin:0;color:#24292f}
+.wrap{max-width:640px;margin:40px auto;background:#fff;border:1px solid #d0d7de;border-radius:8px;padding:24px}
+h1{font-size:1.3rem;margin:0 0 4px}
+.sub{color:#57606a;font-size:.9rem;margin-bottom:18px}
+label{display:block;font-weight:700;margin:14px 0 4px;font-size:.92rem}
+input[type=text]{width:100%;padding:8px;border:1px solid #ccc;border-radius:5px;font-size:.95rem;box-sizing:border-box}
+.row{display:flex;gap:10px;align-items:center;margin-top:14px}
+button{background:#1d4ed8;color:#fff;border:0;border-radius:6px;padding:9px 18px;font-weight:700;cursor:pointer;font-size:.95rem}
+button.secondary{background:#fff;color:#1d4ed8;border:1px solid #1d4ed8}
+#msg{margin-top:14px;padding:10px;border-radius:6px;font-size:.92rem;display:none}
+.ok{background:#d4edda;color:#155724;border:1px solid #c3e6cb}
+.bad{background:#f8d7da;color:#721c24;border:1px solid #f5c6cb}
+.chip{display:inline-block;padding:2px 10px;border-radius:999px;font-size:.82rem;font-weight:700;background:#eef1f4}
+.chip.active{background:#d4edda;color:#155724}.chip.bad{background:#f8d7da;color:#721c24}
+.muted{color:#57606a}
+a{color:#1d4ed8}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>TA-IPMI License</h1>
+  <div class="sub">Commercial use requires a paid license — buy at <a href="https://bentleypc.com/TA-IPMI/" target="_blank" rel="noopener">bentleypc.com/TA-IPMI</a>. Evaluation, personal and lab use is free. Your key enables hourly usage beacons so renewals and seat counts just work. The beacon sends only: key, hostname, app name, app version.</div>
+  <div>Current state: <span id="chip" class="chip">loading…</span> <span id="seats" class="muted"></span></div>
+  <label for="key">License key (format BP-…)</label>
+  <input type="text" id="key" placeholder="BP-xxxxxxxxxxxx" autocomplete="off" spellcheck="false">
+  <div class="row">
+    <input type="checkbox" id="tel" checked>
+    <label for="tel" style="margin:0;font-weight:400">Send hourly usage beacon (recommended, keeps your license healthy)</label>
+  </div>
+  <div class="row">
+    <button id="save">Save key</button>
+    <button id="clear" class="secondary">Remove key</button>
+  </div>
+  <div id="msg"></div>
+</div>
+<script>
+const API = '/custom/TA-IPMI/license/';
+function msg(ok, t){const m=document.getElementById('msg');m.style.display='block';m.className=ok?'ok':'bad';m.textContent=t;}
+function show(st){
+  const c=document.getElementById('chip'), s=document.getElementById('seats');
+  if(!st.configured){c.textContent='No key set (free evaluation mode)';c.className='chip';}
+  else if(st.verify && st.verify.ok){c.textContent='Active — '+(st.verify.seats||'?')+' seat'+((st.verify.seats||1)>1?'s':'');c.className='chip active';}
+  else {c.textContent='Key rejected ('+(st.verify&&st.verify.reason||'?')+')';c.className='chip bad';}
+  s.textContent = st.configured ? (st.telemetry_enabled==='1'?'beacon on':'beacon off') : '';
+  if(st.configured) document.getElementById('tel').checked = st.telemetry_enabled==='1';
+}
+fetch(API+'status',{credentials:'same-origin'}).then(r=>r.json()).then(show).catch(e=>{show({configured:false});msg(false,'Could not reach license service: '+e);});
+document.getElementById('save').onclick=()=>{
+  const k=document.getElementById('key').value.trim();
+  if(!k){msg(false,'Paste a key first, or use Remove key.');return;}
+  fetch(API+'save?key='+encodeURIComponent(k)+'&telemetry='+(document.getElementById('tel').checked?'1':'0'),{credentials:'same-origin'})
+    .then(r=>r.json()).then(st=>{if(st.ok){msg(true,'Saved.');show(st);}else msg(false,'Rejected: '+st.reason);});
+};
+document.getElementById('clear').onclick=()=>{
+  fetch(API+'save?key=&telemetry=0',{credentials:'same-origin'}).then(r=>r.json()).then(st=>{msg(true,'Key removed — back to free evaluation mode.');document.getElementById('key').value='';show(st);});
+};
+</script>
+</body>
+</html>
